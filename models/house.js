@@ -8,7 +8,8 @@ const HouseSchema = new Schema(
     acceptanceInfo: { room: Number, bath: Number, people: Number },
     facility: { basic: String, preference: String, safety: String, accessibility: String },
     cost: { weekdays: Number, weekend: Number },
-    reservation: { type: Types.ObjectId, required: true, ref: "Reservation" },
+    reservations: [{ type: Types.ObjectId, ref: "Reservation" }],
+    reviews: [{ type: Types.ObjectId, ref: "Review" }],
   },
   { timestamps: true }
 );
