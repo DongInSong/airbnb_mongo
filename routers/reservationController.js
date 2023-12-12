@@ -28,8 +28,7 @@ reservRouter.post("/bookHouse/:houseId/:guestId/:checkin/:checkout/:people", asy
     }
     if (house.houseType === "WHOLE") {
       if (checkRoom(checkin, checkout, getBookedDates(allReservation))) {
-        let text = "날짜가 중복됩니다.";
-        res.json(text);
+        return res.status(400).send("The room is not enough.");
       } else {
         const reservation = new Reservation({
           time: {
@@ -67,8 +66,7 @@ reservRouter.post("/bookHouse/:houseId/:guestId/:checkin/:checkout/:people", asy
       }
 
       if (!isAvailable) {
-        let text = "방이 부족합니다.";
-        res.json(text);
+        return res.status(400).send("The room is not enough");
       } else {
         const reservation = new Reservation({
           time: {

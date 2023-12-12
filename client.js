@@ -7,8 +7,8 @@ const rl = require("readline").createInterface({
   output: process.stdout,
 });
 
-const checkin = new Date(2023, 11, 19);
-const checkout = new Date(2023, 11, 21);
+const checkin = new Date(2023, 11, 5);
+const checkout = new Date(2023, 11, 7);
 const people = 6;
 const houseType = "WHOLE";
 
@@ -47,14 +47,16 @@ var recursiveAsyncReadLine = function () {
     }
     if (answer == "5") {
       rl.question("게스트 아이디: ", async function (guestId) {
-        await reservationHistory(guestId);
+        await getMyPage(guestId, "ALL");
+        await getMyPage(guestId, "ONCOMING");
+        await getMyPage(guestId, "TERMINATED");
         recursiveAsyncReadLine();
       });
     }
     if (answer == "6") {
       rl.question("게스트 아이디: ", async function (guestId) {
         rl.question("예약 번호: ", async function (reserveId) {
-          await daddComment(guestId, reserveId, 5, "너무 좋았습니다.");
+          await postComment(guestId, reserveId, 5, "너무 좋았습니다.");
           recursiveAsyncReadLine();
         });
       });
@@ -98,6 +100,24 @@ async function deleteBookHouse(reservationId) {
   }
 }
 
+async function getMyPage(guestId, type) {
+  try {
+    const res = await axios.get(`http://localhost:3000/myPage/${guestId}/${type}`);
+    console.log(res.data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+async function postComment(guestId, reserveId, star, comment) {
+  try {
+    const res = await axios.post(`http://localhost:3000/addComment/${guestId}/${reserveId}/${star}/${comment}`);
+    console.log(res.data);
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 function printHouse(data) {
   var starAvg = 0;
   if (data.reviews.length > 0) {
@@ -127,7 +147,7 @@ function printHouse(data) {
       data.cost.weekend +
       "\n" +
       "평균 리뷰: " +
-      starAvg +
+      starAvg.toFixed(1) +
       "\n" +
       "----------------------------------------\n"
   );
