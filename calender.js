@@ -1,7 +1,7 @@
 const { House } = require("./models/house"); // Update the path accordingly
 const mongoose = require("mongoose");
 
-function getCalendar(mm, house) {
+function getCalendar(mm, house, res) {
   const date = new Date();
   const yy = date.getFullYear();
   let d = 1;
@@ -50,10 +50,13 @@ function getCalendar(mm, house) {
     ar[1] = 28;
   }
 
+  console.log("예약 현황");
+  console.log();
   console.log(`현재: ${yy}년 ${month[mm - 1]}`);
+  console.log();
 
   for (let k = 0; k < 7; k++) {
-    console.log("   " + day[k] +  "   ");
+    process.stdout.write("   " + day[k] + "   ");
   }
 
   console.log("\n");
@@ -68,34 +71,34 @@ function getCalendar(mm, house) {
   if (spaces < 0) spaces = 6;
 
   for (let i = 0; i < spaces; i++) {
-    console.log("         ");
+    process.stdout.write("         ");
   }
 
   if (house.houseType === "PERSONAL") {
-    console.log("PERSONAL");
-    //   this.printPersonal(house, ar, mm, spaces, localDate);
+    // console.log(house.acceptanceInfo.room);
+    const localDate = new Date(yy - 1, mm, 1);
+    printPersonal(res, house, ar, mm, spaces, localDate);
   }
   if (house.houseType === "WHOLE") {
-    console.log("WHOLE");
-    //   this.printWhole(house, ar, mm, spaces);
+    printWhole(res, ar, mm, spaces);
   }
 }
 
-function printPersonal(house, ar, mm, spaces, localDate) {
+function printPersonal(res, house, ar, mm, spaces, localDate) {
   let i = 0;
   let j = 0;
   let k = 1;
   let currentRoom = 0;
   let index = 0;
   let isFirstLine = true;
-  const reservationDates = this.getBookedDates(house);
+  const reservationDates = getBookedDates(res);
   let dateCountMap = null;
 
   for (i = 1; i <= ar[mm - 1]; i++) {
-    process.stdout.write(`\x1b[0;1m${i.toString().padEnd(4)}     \x1b[0m`);
+    process.stdout.write(`${i}`.padEnd(9, " "));
 
     if ((i + spaces) % 7 === 0 || i === ar[mm - 1]) {
-      console.log("\n\n");
+      console.log("\n");
       if (isFirstLine) {
         for (j = 0; j < spaces; j++) {
           process.stdout.write("         ");
@@ -104,19 +107,20 @@ function printPersonal(house, ar, mm, spaces, localDate) {
       }
       for (; k <= i && k <= ar[mm - 1]; k++) {
         localDate.setDate(k);
+
         if (reservationDates === null) {
           currentRoom = house.acceptanceInfo.room;
         } else {
-          dateCountMap = this.countDates(reservationDates);
+          dateCountMap = countDates(reservationDates);
           currentRoom = house.acceptanceInfo.room;
           for (const [key, value] of dateCountMap.entries()) {
-            if (localDate.getTime() === key.getTime()) {
+            if (localDate.getTime() === new Date(key).getTime()) {
               currentRoom = house.acceptanceInfo.room - value;
               break;
             }
           }
         }
-        process.stdout.write(`${currentRoom.toString().padStart(5)}    `);
+        process.stdout.write("    " + `${currentRoom}`.padEnd(5, " "));
       }
       k = i + 1;
       console.log("\n\n");
@@ -124,20 +128,20 @@ function printPersonal(house, ar, mm, spaces, localDate) {
   }
 }
 
-function printWhole(house, ar, mm, spaces) {
+function printWhole(res, ar, mm, spaces) {
   let i = 0;
   let j = 0;
   let k = 1;
   let currentRoom = "◯";
   let index = 0;
   let isFirstLine = true;
-  const reservationDates = this.getBookedDates(house);
+  const reservationDates = getBookedDates(res);
 
   for (i = 1; i <= ar[mm - 1]; i++) {
-    process.stdout.write(`\x1b[0;1m${i.toString().padEnd(4)}     \x1b[0m`);
+    process.stdout.write(`${i}`.padEnd(9, " "));
 
     if ((i + spaces) % 7 === 0 || i === ar[mm - 1]) {
-      console.log("\n\n");
+      console.log("\n");
       if (isFirstLine) {
         for (j = 0; j < spaces; j++) {
           process.stdout.write("         ");
@@ -145,16 +149,18 @@ function printWhole(house, ar, mm, spaces) {
         isFirstLine = false;
       }
       for (; k <= i && k <= ar[mm - 1]; k++) {
-        if (reservationDates === null) {
+        if (reservationDates.length <= 0) {
           currentRoom = "◯";
-        } else if (mm !== reservationDates[index].getMonth() + 1) {
-          currentRoom = "◯";
-        } else if (k === reservationDates[index].getDate()) {
+        }
+        // else if (mm !== reservationDates[index].getMonth() + 1) {
+        //   currentRoom = "◯";
+        // }
+        else if (k === reservationDates[index].getDate()) {
           currentRoom = "*";
           if (index !== reservationDates.length - 1) index++;
         } else currentRoom = "◯";
 
-        process.stdout.write(`${currentRoom.toString().padStart(5)}    `);
+        process.stdout.write("    " + `${currentRoom}`.padEnd(5, " "));
       }
       k = i + 1;
       console.log("\n\n");
@@ -163,33 +169,27 @@ function printWhole(house, ar, mm, spaces) {
 }
 
 function countDates(dates) {
-  const dateCountMap = new Map();
-  for (const date of dates) {
-    dateCountMap.set(date, (dateCountMap.get(date) || 0) + 1);
-  }
-
-  return new Map([...dateCountMap.entries()].sort((a, b) => a[0] - b[0]));
+  let dateCountMap = new Map();
+  dates.forEach((date) => {
+    date.setHours(0, 0, 0, 0);
+    const dateString = date.toISOString();
+    dateCountMap.set(dateString, (dateCountMap.get(dateString) || 0) + 1);
+  });
+  return dateCountMap;
 }
 
-function getBookedDates(house) {
-  if (house.reservationList.length === 0) {
-    return null;
-  }
-
+function getBookedDates(res) {
   let checkin = null;
   let checkout = null;
   const totalDates = [];
 
-  for (let i = 0; i < house.reservationList.length; i++) {
-    checkin = new Date(house.reservationList[i].checkin);
-    checkout = new Date(house.reservationList[i].checkout);
-
-    let checkin_localDate = new Date(checkin.getFullYear(), checkin.getMonth(), checkin.getDate());
-    const checkout_localDate = new Date(checkout.getFullYear(), checkout.getMonth(), checkout.getDate());
-
-    while (checkin_localDate <= checkout_localDate) {
-      totalDates.push(new Date(checkin_localDate));
-      checkin_localDate.setDate(checkin_localDate.getDate() + 1);
+  for (let i = 0; i < res.length; i++) {
+    checkin = new Date(res[i].time.checkin);
+    checkout = new Date(res[i].time.checkout);
+    while (checkin <= checkout) {
+      // console.log(checkin)
+      totalDates.push(new Date(checkin));
+      checkin.setDate(checkin.getDate() + 1);
     }
   }
 
@@ -197,4 +197,4 @@ function getBookedDates(house) {
   return totalDates;
 }
 
-module.exports = { getCalendar };
+module.exports = { getCalendar, getBookedDates };

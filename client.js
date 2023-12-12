@@ -1,4 +1,5 @@
 const axios = require("axios");
+const { getCalendar, getBookedDates } = require("./calender");
 console.log("client is running...");
 
 const rl = require("readline").createInterface({
@@ -6,8 +7,8 @@ const rl = require("readline").createInterface({
   output: process.stdout,
 });
 
-const checkin = new Date(2022, 12, 11, 15, 0);
-const checkout = new Date(2022, 12, 15, 11, 0);
+const checkin = new Date(2022, 12, 19);
+const checkout = new Date(2022, 12, 21);
 const people = 6;
 const houseType = "WHOLE";
 
@@ -78,8 +79,9 @@ async function getAllHouses(checkin, checkout, people, houseType) {
 
 async function getHouseDetail(houseId) {
   const res = await axios.get(`http://localhost:3000/houseDetail/${houseId}`);
-  printHouse(res.data);
-  printAllReview(res.data);
+  printHouse(res.data[0]);
+  printAllReview(res.data[0]);
+  getCalendar(12, res.data[0], res.data[1]);
 }
 
 async function postBookHouse(houseId, guestId, checkin, checkout, people) {

@@ -15,7 +15,7 @@ const DB_URI = "mongodb://127.0.0.1:27017/testdb";
 const server = async () => {
   try {
     await mongoose.connect(DB_URI);
-    // generateDummyData(5, 10);
+    generateDummyData(5, 10);
     app.use(express.json());
     app.use(guestController);
     app.use(houseController);

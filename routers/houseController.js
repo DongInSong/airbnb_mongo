@@ -1,7 +1,6 @@
 const { Router } = require("express");
 const { isValidObjectId } = require("mongoose");
 const { House, Review, Reservation } = require("../models");
-const { getCalendar } = require("../calender");
 const houseRouter = Router();
 
 // 1번 숙소 조회
@@ -39,9 +38,16 @@ houseRouter.get("/houseDetail/:houseId", async (req, res) => {
     if (!isValidObjectId(houseId)) {
       return res.status(400).send({ error: "houseId is invalid" });
     }
-
     const house = await House.findById(houseId).populate("reviews");
-    res.json(house);
+    let allReservation = [];
+    for(const reserveId of house.reservations) {
+      const reservations = await Reservation.findById(reserveId);
+      allReservation.push(reservations);
+    }
+    let result = [];
+    result.push(house);
+    result.push(allReservation);
+    res.json(result);
   } catch (error) {
     console.error("Error fetching houses:", error);
     res.status(500).json({ error: "Internal Server Error" });

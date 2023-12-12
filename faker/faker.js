@@ -91,7 +91,7 @@ generateDummyData = async (nGuest, nReviews) => {
     );
   }
 
-  houseName = getHouseName();
+  var houseName = getHouseName();
   // name: { type: String, required: true },
   // address: { city: String, street: String, zipCode: String },
   // houseType: { type: String, enum: ["PERSONAL", "WHOLE"], default: "PERSONAL" },
@@ -100,7 +100,7 @@ generateDummyData = async (nGuest, nReviews) => {
   // cost: { weekdays: Number, weekend: Number },
   // reservation: { type: Types.ObjectId, ref: "Reservation" },
 
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < houseName.length - 1; i++) {
     houses.push(
       new House({
         name: houseName[i],
