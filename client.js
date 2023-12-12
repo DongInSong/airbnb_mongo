@@ -7,8 +7,8 @@ const rl = require("readline").createInterface({
   output: process.stdout,
 });
 
-const checkin = new Date(2022, 12, 19);
-const checkout = new Date(2022, 12, 21);
+const checkin = new Date(2023, 11, 19);
+const checkout = new Date(2023, 11, 21);
 const people = 6;
 const houseType = "WHOLE";
 

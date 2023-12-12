@@ -76,7 +76,7 @@ function getCalendar(mm, house, res) {
 
   if (house.houseType === "PERSONAL") {
     // console.log(house.acceptanceInfo.room);
-    const localDate = new Date(yy - 1, mm, 1);
+    const localDate = new Date(yy, mm - 1, 1);
     printPersonal(res, house, ar, mm, spaces, localDate);
   }
   if (house.houseType === "WHOLE") {
