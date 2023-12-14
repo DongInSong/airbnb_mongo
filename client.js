@@ -7,10 +7,10 @@ const rl = require("readline").createInterface({
   output: process.stdout,
 });
 
-const checkin = new Date(2023, 11, 5);
-const checkout = new Date(2023, 11, 7);
+const checkin = new Date(2023, 11, 11);
+const checkout = new Date(2023, 11, 12);
 const people = 6;
-const houseType = "WHOLE";
+const houseType = "PERSONAL";
 
 var recursiveAsyncReadLine = function () {
   console.log("   1. 숙소 조회      2. 상세 조회");

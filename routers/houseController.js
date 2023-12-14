@@ -40,7 +40,7 @@ houseRouter.get("/houseDetail/:houseId", async (req, res) => {
     }
     const house = await House.findById(houseId).populate("reviews");
     let allReservation = [];
-    for(const reserveId of house.reservations) {
+    for (const reserveId of house.reservations) {
       const reservations = await Reservation.findById(reserveId);
       allReservation.push(reservations);
     }
