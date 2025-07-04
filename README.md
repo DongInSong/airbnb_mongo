@@ -1,6 +1,7 @@
 # Express and MongoDB Project - airbnb
 
-Express.js와 MongoDB를 사용하여 구축된 에어비앤비(Airbnb)와 유사한 백엔드 애플리케이션
+![image](https://github.com/user-attachments/assets/be708835-a948-46b7-97db-5f7ff8ad7a21)
+
 
 ## 코드 구조
 -   `server.js`: Express 서버 설정 및 데이터베이스 연결
